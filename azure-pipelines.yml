@@ -18,3 +18,23 @@ steps:
 - script: |
     npm install
   displayName: 'install dependences'
+
+- script: |
+    npm run lint
+  displayName: 'Lint with ESLint'
+
+- script: |
+      npm install --global prettier
+  displayName: 'Format with Prettier'
+
+- script: |
+      npm run prettier --check
+  displayName: 'Format with Prettier'
+
+- script: |
+    CI=true npm run test
+  displayName: 'Run Jest tests'
+
+- script: |
+    npm run build
+  displayName: 'Build the app'
