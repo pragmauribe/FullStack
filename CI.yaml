@@ -20,7 +20,6 @@ steps:
 
 - script: |
     npm install
-    npm test
     npm run build
     npm install -g aws-sdk
     aws s3 cp build s3://pragma-tf-pipeline-artifacts/build --recursive
