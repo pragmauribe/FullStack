@@ -40,16 +40,23 @@ steps:
     replaceExistingArchive: true
   displayName: 'Create Artifact'
 
-- task: AWSCLI@1
+# - task: AWSCLI@1
+#   inputs:
+#     awsCredentials: 'AWS'
+#     regionName: '$(awsRegion)'
+#     awsCommand: 's3'
+#     awsSubCommand: 'cp'
+#     arguments: '$(Build.ArtifactStagingDirectory)/build.zip s3://$(awsBucketName)/build.zip'
+#     paths: '$(Build.ArtifactStagingDirectory)/build'
+#   displayName: 'Upload Artifact to S3'
+
+- task: AWSShellScript@1
   inputs:
     awsCredentials: 'AWS'
-    regionName: '$(awsRegion)'
-    awsCommand: 's3'
-    awsSubCommand: 'cp'
-    arguments: '$(Build.ArtifactStagingDirectory)/build.zip s3://$(awsBucketName)/build.zip'
-    paths: '$(Build.ArtifactStagingDirectory)/build'
-  displayName: 'Upload Artifact to S3'
- 
+    regionName: 'us-west-2'
+    scriptType: 'inline'
+    inlineScript: 'aws s3 cp build.zip s3://pragma-tf-pipeline-artifacts'
+  displayName: 'upload Artifact'
 # - task: AWSBeanstalkDeploy@1
 #   inputs:
 #     awsCredentials: 'AWS'
