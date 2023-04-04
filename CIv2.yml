@@ -1,0 +1,69 @@
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  awsRegion: 'us-west-2'
+  awsBucketName: 'pragma-tf-pipeline-artifacts'
+  awsEnvironment: 'myenv'
+# - group: FullStack
+#   AWS_ACCESS_KEY_ID: <tu-access-key-id>
+#   AWS_SECRET_ACCESS_KEY: <tu-secret-access-key>
+#   AWS_DEFAULT_REGION: <tu-region-de-aws>
+#   AWS_S3_BUCKET: <nombre-del-bucket-en-s3>
+#   APPLICATION_NAME: <nombre-de-la-aplicacion-en-beanstalk>
+#   ENVIRONMENT_NAME: <nombre-del-entorno-en-beanstalk>
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install
+    npm run lint
+    npm install --global prettier
+    npm run prettier --check
+    CI=true npm run test
+    npm run build
+  displayName: 'Build and Test'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)/build'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/build.zip'
+    replaceExistingArchive: true
+  displayName: 'Create Artifact'
+
+- task: AWSCLI@1
+  inputs:
+    awsCredentials: 'AWS'
+    regionName: '$(awsRegion)'
+    awsCommand: 's3'
+    awsSubCommand: 'cp'
+    arguments: '$(Build.ArtifactStagingDirectory)/build.zip s3://$(awsBucketName)/build.zip'
+    paths: '$(Build.ArtifactStagingDirectory)/build'
+  displayName: 'Upload Artifact to S3'
+ 
+# - task: AWSBeanstalkDeploy@1
+#   inputs:
+#     awsCredentials: 'AWS'
+#     regionName: '$(awsRegion)'
+#     applicationName: 'myapp'
+#     environmentName: '$(awsEnvironment)'
+#     versionLabel: '$(Build.BuildId)'
+#     sourceBundle: 's3://$(awsBucketName)/build.zip'
+#   displayName: 'Deploy to AWS Elastic Beanstalk'
+
+- task: AWSCLI@1
+  inputs:
+    awsCredentials: 'AWS'
+    regionName: '$(awsRegion)'
+    awsCommand: 'elasticbeanstalk update-environment'
+    arguments: '--environment-name $(awsEnvironment) --version-label $(Build.BuildId)'
+  displayName: 'Deploy to Beanstalk'
