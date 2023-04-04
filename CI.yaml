@@ -50,12 +50,20 @@ steps:
     paths: '$(Build.ArtifactStagingDirectory)/build'
   displayName: 'Upload Artifact to S3'
  
-- task: AWSBeanstalkDeploy@1
+# - task: AWSBeanstalkDeploy@1
+#   inputs:
+#     awsCredentials: 'AWS'
+#     regionName: '$(awsRegion)'
+#     applicationName: 'myapp'
+#     environmentName: '$(awsEnvironment)'
+#     versionLabel: '$(Build.BuildId)'
+#     sourceBundle: 's3://$(awsBucketName)/build.zip'
+#   displayName: 'Deploy to AWS Elastic Beanstalk'
+
+- task: AWSCLI@1
   inputs:
     awsCredentials: 'AWS'
     regionName: '$(awsRegion)'
-    applicationName: 'myapp'
-    environmentName: '$(awsEnvironment)'
-    versionLabel: '$(Build.BuildId)'
-    sourceBundle: 's3://$(awsBucketName)/build.zip'
-  displayName: 'Deploy to AWS Elastic Beanstalk'
+    awsCommand: 'elasticbeanstalk update-environment'
+    arguments: '--environment-name $(awsEnvironment) --version-label $(Build.BuildId)'
+  displayName: 'Deploy to Beanstalk'
