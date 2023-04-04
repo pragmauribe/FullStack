@@ -30,7 +30,7 @@ steps:
 - task: AWSCLI@1
   inputs:
     awsCredentials: 'AWS'
-    regionName: '<nombre_de_la_region_en_AWS>'
+    regionName: 'us-west-2'
     command: 's3 cp'
     arguments: './build.zip s3://pragma-tf-pipeline-artifacts/build.zip'
   displayName: 'Upload Artifact to S3'
