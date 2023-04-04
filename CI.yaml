@@ -29,6 +29,15 @@ steps:
     npm run build
   displayName: 'Build and Test'
 
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/build'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/build.zip'
+    replaceExistingArchive: true
+  displayName: 'Create Build Artifact'
+
 - bash: |
     mkdir ~/.aws
     cat >> ~/.aws/credentials << EOL
