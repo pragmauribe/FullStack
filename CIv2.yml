@@ -55,8 +55,18 @@ steps:
     awsCredentials: 'AWS'
     regionName: 'us-west-2'
     scriptType: 'inline'
-    inlineScript: 'aws s3 cp build.zip s3://pragma-tf-pipeline-artifacts'
+    inlineScript: 'aws s3 cp $(System.DefaultWorkingDirectory)/build.zip s3://pragma-tf-pipeline-artifacts'
   displayName: 'upload Artifact'
+
+# - task: AWSShellScript@1
+#   inputs:
+#     awsCredentials: 'AWS'
+#     regionName: 'us-east-2'
+#     scriptType: 'inline'
+#     inlineScript: 'aws s3 cp nodejs.zip s3://pragma-tf-pipeline-artifacts'
+#     disableAutoCwd: true
+#     workingDirectory: '$(System.DefaultWorkingDirectory)'
+
 # - task: AWSBeanstalkDeploy@1
 #   inputs:
 #     awsCredentials: 'AWS'
