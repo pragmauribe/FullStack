@@ -29,19 +29,24 @@ steps:
     npm run build
   displayName: 'Build and Test'
 
-# - bash: |
-#     mkdir ~/.aws
-#     cat >> ~/.aws/credentials << EOL
-#     [default]
-#     aws_access_key_id=$(AWS_ACCESS)
-#     aws_secret_access_key=$(AWS_SECRET)
-#     EOL
-#   displayName: 'Set AWS credentials'
+- bash: |
+    mkdir ~/.aws
+    cat >> ~/.aws/credentials << EOL
+    [default]
+    aws_access_key_id=$(AWS_ACCESS)
+    aws_secret_access_key=$(AWS_SECRET)
+    EOL
+  displayName: 'Set AWS credentials'
+
+- bash: | 
+    echo $AWS_ACCESS
+    echo $AWS_SECRET
+  displayName: 'Variables'
 
 
 - task: AWSCLI@1
   inputs:
-    #awsCredentials: 'AWS'
+    awsCredentials: 'AWS'
     regionName: 'us-west-2'
     command: 'aws s3 cp'
     arguments: './build.zip s3://$(bucket)/build.zip'
@@ -49,3 +54,19 @@ steps:
   # env:
   #   AWS_ACCESS_KEY_ID: $(AWS_ACCESS)
   #   AWS_SECRET_ACCESS_KEY: $(AWS_SECRET)
+
+- task: AWSCLI@1
+  inputs:
+    awsCredentials: 'AWS'
+    regionName: 'us-west-2'
+    awsCommand: 'elasticbeanstalk create-application-version'
+    arguments: '--application-name myapp --version-label $(Build.BuildId) --source-bundle S3Bucket=$(bucket),S3Key=build.zip'
+  displayName: 'Create Beanstalk Application Version'
+
+- task: AWSCLI@1
+  inputs:
+    awsCredentials: 'AWS'
+    regionName: 'us-west-2'
+    awsCommand: 'elasticbeanstalk update-environment'
+    arguments: '--environment-name myenv --version-label $(Build.BuildId)'
+  displayName: 'Deploy to Beanstalk'  
