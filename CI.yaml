@@ -20,8 +20,11 @@ steps:
 
 - script: |
     npm install
+    npm run lint
+    npm install --global prettier
+    npm run prettier --check
+    CI=true npm run test
     npm run build
-    npm run test
   displayName: 'Build and Test'
 
 - task: AWSCLI@1
