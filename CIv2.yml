@@ -55,7 +55,7 @@ steps:
     awsCredentials: 'AWS'
     regionName: 'us-west-2'
     scriptType: 'inline'
-    inlineScript: 'aws s3 cp $(System.DefaultWorkingDirectory)/build.zip s3://pragma-tf-pipeline-artifacts'
+    inlineScript: 'aws s3 cp $(System.ArtifactStagingDirectory)/build.zip s3://pragma-tf-pipeline-artifacts'
   displayName: 'upload Artifact'
 
 # - task: AWSShellScript@1
