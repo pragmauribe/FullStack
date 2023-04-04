@@ -48,7 +48,7 @@ steps:
   inputs:
     awsCredentials: 'AWS'
     regionName: 'us-west-2'
-    command: 'aws s3 cp'
+    awsCommand: 'aws s3 cp'
     arguments: './build.zip s3://$(bucket)/build.zip'
   displayName: 'Upload Artifact to S3'
   # env:
