@@ -5,7 +5,8 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-- group: FullStack
+  bucket: pragma-tf-pipeline-artifacts
+# - group: FullStack
 #   AWS_ACCESS_KEY_ID: <tu-access-key-id>
 #   AWS_SECRET_ACCESS_KEY: <tu-secret-access-key>
 #   AWS_DEFAULT_REGION: <tu-region-de-aws>
@@ -28,23 +29,23 @@ steps:
     npm run build
   displayName: 'Build and Test'
 
-- bash: |
-    mkdir ~/.aws
-    cat >> ~/.aws/credentials << EOL
-    [default]
-    aws_access_key_id=$(AWS_ACCESS)
-    aws_secret_access_key=$(AWS_SECRET)
-    EOL
-  displayName: 'Set AWS credentials'
+# - bash: |
+#     mkdir ~/.aws
+#     cat >> ~/.aws/credentials << EOL
+#     [default]
+#     aws_access_key_id=$(AWS_ACCESS)
+#     aws_secret_access_key=$(AWS_SECRET)
+#     EOL
+#   displayName: 'Set AWS credentials'
 
 
 - task: AWSCLI@1
   inputs:
-    awsCredentials: 'AWS'
+    #awsCredentials: 'AWS'
     regionName: 'us-west-2'
-    command: 's3 cp'
-    arguments: './build.zip s3://pragma-tf-pipeline-artifacts/build.zip'
+    command: 'aws s3 cp'
+    arguments: './build.zip s3://$(bucket)/build.zip'
   displayName: 'Upload Artifact to S3'
-  env:
-    AWS_ACCESS_KEY_ID: $(AWS_ACCESS)
-    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET)
+  # env:
+  #   AWS_ACCESS_KEY_ID: $(AWS_ACCESS)
+  #   AWS_SECRET_ACCESS_KEY: $(AWS_SECRET)
