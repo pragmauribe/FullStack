@@ -21,6 +21,13 @@ steps:
 - script: |
     npm install
     npm run build
-    npm install -g aws-sdk
-    aws s3 cp build s3://pragma-tf-pipeline-artifacts/build --recursive
-  displayName: 'npm install, test, build, and upload to S3'
+    npm run test
+  displayName: 'Build and Test'
+
+- task: AWSCLI@1
+  inputs:
+    awsCredentials: 'AWS'
+    regionName: '<nombre_de_la_region_en_AWS>'
+    command: 's3 cp'
+    arguments: './build.zip s3://pragma-tf-pipeline-artifacts/build.zip'
+  displayName: 'Upload Artifact to S3'
