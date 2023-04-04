@@ -5,7 +5,9 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  bucket: pragma-tf-pipeline-artifacts
+  awsRegion: 'us-west-2'
+  awsBucketName: 'pragma-tf-pipeline-artifacts'
+  awsEnvironment: 'myenv'
 # - group: FullStack
 #   AWS_ACCESS_KEY_ID: <tu-access-key-id>
 #   AWS_SECRET_ACCESS_KEY: <tu-secret-access-key>
@@ -31,56 +33,29 @@ steps:
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/build'
+    rootFolderOrFile: '$(Build.SourcesDirectory)/build'
     includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/build.zip'
     replaceExistingArchive: true
-  displayName: 'Create Build Artifact'
-
-- bash: |
-    mkdir ~/.aws
-    cat >> ~/.aws/credentials << EOL
-    [default]
-    aws_access_key_id=$(AWS_ACCESS)
-    aws_secret_access_key=$(AWS_SECRET)
-    EOL
-  displayName: 'Set AWS credentials'
-
-- bash: | 
-    echo $AWS_ACCESS
-    echo $AWS_SECRET
-  displayName: 'Variables'
-
+  displayName: 'Create Artifact'
 
 - task: AWSCLI@1
   inputs:
     awsCredentials: 'AWS'
-    regionName: 'us-west-2'
+    regionName: '$(awsRegion)'
     awsCommand: 's3'
     awsSubCommand: 'cp'
-    #arguments: '$(Build.ArtifactStagingDirectory)/build.zip s3://$(bucket)/build.zip'
-    #parameters: './build.zip s3://$(bucket)/build.zip'
-    arguments: '$(System.DefaultWorkingDirectory)/build.zip s3://$(bucket)/build.zip'
-    #paths: '$(Build.ArtifactStagingDirectory)/build'
-    paths: '$(System.DefaultWorkingDirectory)/build'
+    arguments: '$(Build.ArtifactStagingDirectory)/build.zip s3://$(awsBucketName)/build.zip'
+    paths: '$(Build.ArtifactStagingDirectory)/build'
   displayName: 'Upload Artifact to S3'
-  # env:
-  #   AWS_ACCESS_KEY_ID: $(AWS_ACCESS)
-  #   AWS_SECRET_ACCESS_KEY: $(AWS_SECRET)
-
-- task: AWSCLI@1
+ 
+- task: AWSBeanstalkDeploy@1
   inputs:
     awsCredentials: 'AWS'
-    regionName: 'us-west-2'
-    awsCommand: 'elasticbeanstalk create-application-version'
-    arguments: '--application-name myapp --version-label $(Build.BuildId) --source-bundle S3Bucket=$(bucket),S3Key=build.zip'
-  displayName: 'Create Beanstalk Application Version'
-
-- task: AWSCLI@1
-  inputs:
-    awsCredentials: 'AWS'
-    regionName: 'us-west-2'
-    awsCommand: 'elasticbeanstalk update-environment'
-    arguments: '--environment-name myenv --version-label $(Build.BuildId)'
-  displayName: 'Deploy to Beanstalk'  
+    regionName: '$(awsRegion)'
+    applicationName: 'myapp'
+    environmentName: '$(awsEnvironment)'
+    versionLabel: '$(Build.BuildId)'
+    sourceBundle: 's3://$(awsBucketName)/build.zip'
+  displayName: 'Deploy to AWS Elastic Beanstalk'
