@@ -50,13 +50,13 @@ steps:
 #     paths: '$(Build.ArtifactStagingDirectory)/build'
 #   displayName: 'Upload Artifact to S3'
 
-- task: AWSShellScript@1
-  inputs:
-    awsCredentials: 'AWS'
-    regionName: 'us-west-2'
-    scriptType: 'inline'
-    inlineScript: 'aws s3 cp $(Build.ArtifactStagingDirectory)/build.zip s3://pragma-tf-pipeline-artifacts'
-  displayName: 'upload Artifact'
+#- task: AWSShellScript@1
+#  inputs:
+#    awsCredentials: 'AWS'
+#    regionName: 'us-west-2'
+#    scriptType: 'inline'
+#    inlineScript: 'aws s3 cp $(Build.ArtifactStagingDirectory)/build.zip s3://pragma-tf-pipeline-artifacts'
+#  displayName: 'upload Artifact'
 
 # - task: AWSShellScript@1
 #   inputs:
@@ -85,15 +85,15 @@ steps:
 #     arguments: '--environment-name $(awsEnvironment) --version-label $(Build.BuildId)'
 #   displayName: 'Deploy to Beanstalk'
 
-- task: BeanstalkDeployApplication@1
-  displayName: 'Deploy to Elastic Beanstalk: angular-docker-test'
-  inputs:
-    awsCredentials: 'AWS'
-    regionName: '$(awsRegion)'
-    applicationName: 'myapp'
-    environmentName: 'myenv'
-    applicationType: s3
-    deploymentBundleBucket: '$(awsBucketName)'
-    deploymentBundleKey: code.zip
-    logRequest: true
-    logResponse: true
+#- task: BeanstalkDeployApplication@1
+#  displayName: 'Deploy to Elastic Beanstalk: angular-docker-test'
+#  inputs:
+#    awsCredentials: 'AWS'
+#    regionName: '$(awsRegion)'
+#    applicationName: 'myapp'
+#    environmentName: 'myenv'
+#    applicationType: s3
+#    deploymentBundleBucket: '$(awsBucketName)'
+#    deploymentBundleKey: code.zip
+#    logRequest: true
+#    logResponse: true
