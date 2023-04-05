@@ -94,6 +94,6 @@ steps:
     environmentName: 'myenv'
     applicationType: s3
     deploymentBundleBucket: '$(awsBucketName)'
-    deploymentBundleKey: output.zip
+    deploymentBundleKey: build.zip
     logRequest: true
     logResponse: true
