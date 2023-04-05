@@ -81,6 +81,6 @@ steps:
   inputs:
     awsCredentials: 'AWS'
     regionName: '$(awsRegion)'
-    awsCommand: 'elasticbeanstalk update-environment'
+    awsCommand: 'aws elasticbeanstalk update-environment'
     arguments: '--environment-name $(awsEnvironment) --version-label $(Build.BuildId)'
   displayName: 'Deploy to Beanstalk'
