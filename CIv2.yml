@@ -77,10 +77,23 @@ steps:
 #     sourceBundle: 's3://$(awsBucketName)/build.zip'
 #   displayName: 'Deploy to AWS Elastic Beanstalk'
 
-- task: AWSCLI@1
+# - task: AWSCLI@1
+#   inputs:
+#     awsCredentials: 'AWS'
+#     regionName: '$(awsRegion)'
+#     awsCommand: 'aws elasticbeanstalk update-environment'
+#     arguments: '--environment-name $(awsEnvironment) --version-label $(Build.BuildId)'
+#   displayName: 'Deploy to Beanstalk'
+
+- task: BeanstalkDeployApplication@1
+  displayName: 'Deploy to Elastic Beanstalk: angular-docker-test'
   inputs:
     awsCredentials: 'AWS'
     regionName: '$(awsRegion)'
-    awsCommand: 'aws elasticbeanstalk update-environment'
-    arguments: '--environment-name $(awsEnvironment) --version-label $(Build.BuildId)'
-  displayName: 'Deploy to Beanstalk'
+    applicationName: 'myapp'
+    environmentName: 'myenv'
+    applicationType: s3
+    deploymentBundleBucket: '$(awsBucketName)'
+    deploymentBundleKey: output.zip
+    logRequest: true
+    logResponse: true
